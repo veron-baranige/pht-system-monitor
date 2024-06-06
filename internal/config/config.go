@@ -26,12 +26,16 @@ func Load() error {
 		return err
 	}
 
-	parseEmailConfig()
+	parseConfig()
 
 	return nil
 }
 
 func validateConfig() error {
+	if viper.GetString("SPRINGBOOT_APPLICATION_BASE_URLS") == "" {
+		return errors.New("invalid or missing springboot application base URLs to monitor")
+	}
+
 	if viper.GetInt("MONITOR_INTERVAL_MINUTES") <= 0 {
 		log.Printf("Invalid or missing monitor interval configuration. "+
 			"Setting interval to default value: %v mins", defaultMonitorIntervalMins) // warn
@@ -53,7 +57,12 @@ func validateConfig() error {
 	return nil
 }
 
-func parseEmailConfig() {
+func parseConfig() {
+	rawApplicationBaseUrls := viper.GetString("SPRINGBOOT_APPLICATION_BASE_URLS")
+	if rawApplicationBaseUrls != "" {
+		viper.Set("EMAIL_ALERT_RECIPIENTS", strings.Split(rawApplicationBaseUrls, ","))
+	}
+
 	rawEmailrecipients := viper.GetString("EMAIL_ALERT_RECIPIENTS")
 	if rawEmailrecipients != "" {
 		viper.Set("EMAIL_ALERT_RECIPIENTS", strings.Split(rawEmailrecipients, ","))
