@@ -70,7 +70,7 @@ func parseConfig() {
 		parsedUrls := []string{}
 		for _, rawBaseUrl := range strings.Split(rawApplicationBaseUrls, ",") {
 			parsedUrl, _ := url.Parse(rawBaseUrl)
-			parsedUrls = append(parsedUrls, parsedUrl.String())
+			parsedUrls = append(parsedUrls, strings.TrimRight(parsedUrl.String(), "/"))
 		}
 		viper.Set("SPRINGBOOT_APPLICATION_BASE_URLS", parsedUrls)
 	}
