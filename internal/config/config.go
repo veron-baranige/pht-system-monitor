@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"log"
+	"net/url"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -34,6 +35,12 @@ func Load() error {
 func validateConfig() error {
 	if viper.GetString("SPRINGBOOT_APPLICATION_BASE_URLS") == "" {
 		return errors.New("invalid or missing springboot application base URLs to monitor")
+	}
+
+	for _, rawBaseUrl  := range strings.Split(viper.GetString("SPRINGBOOT_APPLICATION_BASE_URLS"), ",") {
+		if _, err := url.Parse(rawBaseUrl); err != nil {
+			return errors.New("invalid springboot application base URL: " + err.Error())
+		}
 	}
 
 	if viper.GetInt("MONITOR_INTERVAL_MINUTES") <= 0 {
