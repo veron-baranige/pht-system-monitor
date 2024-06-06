@@ -11,6 +11,7 @@ import (
 
 const (
 	defaultMonitorIntervalMins = 5
+	LogoPath                   = "assets/logo.png"
 )
 
 func Load() error {
@@ -37,7 +38,7 @@ func validateConfig() error {
 		return errors.New("invalid or missing springboot application base URLs to monitor")
 	}
 
-	for _, rawBaseUrl  := range strings.Split(viper.GetString("SPRINGBOOT_APPLICATION_BASE_URLS"), ",") {
+	for _, rawBaseUrl := range strings.Split(viper.GetString("SPRINGBOOT_APPLICATION_BASE_URLS"), ",") {
 		if _, err := url.Parse(rawBaseUrl); err != nil {
 			return errors.New("invalid springboot application base URL: " + err.Error())
 		}
