@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"log"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -24,6 +25,8 @@ func Load() error {
 	if err := validateConfig(); err != nil {
 		return err
 	}
+
+	parseEmailConfig()
 
 	return nil
 }
@@ -48,6 +51,13 @@ func validateConfig() error {
 	}
 
 	return nil
+}
+
+func parseEmailConfig() {
+	rawEmailrecipients := viper.GetString("EMAIL_ALERT_RECIPIENTS")
+	if rawEmailrecipients != "" {
+		viper.Set("EMAIL_ALERT_RECIPIENTS", strings.Split(rawEmailrecipients, ","))
+	}
 }
 
 func isValidSmtpConfig() bool {
