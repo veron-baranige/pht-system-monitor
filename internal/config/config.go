@@ -67,7 +67,12 @@ func validateConfig() error {
 func parseConfig() {
 	rawApplicationBaseUrls := viper.GetString("SPRINGBOOT_APPLICATION_BASE_URLS")
 	if rawApplicationBaseUrls != "" {
-		viper.Set("EMAIL_ALERT_RECIPIENTS", strings.Split(rawApplicationBaseUrls, ","))
+		parsedUrls := []string{}
+		for _, rawBaseUrl := range strings.Split(rawApplicationBaseUrls, ",") {
+			parsedUrl, _ := url.Parse(rawBaseUrl)
+			parsedUrls = append(parsedUrls, parsedUrl.String())
+		}
+		viper.Set("SPRINGBOOT_APPLICATION_BASE_URLS", parsedUrls)
 	}
 
 	rawEmailrecipients := viper.GetString("EMAIL_ALERT_RECIPIENTS")
