@@ -1,5 +1,7 @@
 package monitor
 
+import "context"
+
 type (
 	HealthStatus string
 )
@@ -11,3 +13,6 @@ const (
 	Unkown       HealthStatus = "UNKNOWN"
 )
 
+func GetHealthStatus(ctx context.Context, appBaseUrl string) (HealthStatus, error) {
+	return Up, nil
+}
