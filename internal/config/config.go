@@ -1,6 +1,7 @@
 package config
 
 import (
+	"crypto/tls"
 	"errors"
 	"log"
 	"net/http"
@@ -32,7 +33,6 @@ func Load() error {
 	}
 
 	parseConfig()
-	http.DefaultClient.Timeout = time.Second * requestTimeoutSeconds
 
 	return nil
 }
@@ -91,4 +91,13 @@ func parseConfig() {
 func isValidSmtpConfig() bool {
 	return viper.GetString("SMTP_HOST") != "" && viper.GetInt("SMTP_PORT") != 0 &&
 		viper.GetString("SMTP_USER") != "" && viper.GetString("SMTP_PASSWORD") != ""
+}
+
+func SetHttpClientConfig() {
+	http.DefaultClient.Timeout = time.Second * requestTimeoutSeconds
+	http.DefaultClient.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
 }
