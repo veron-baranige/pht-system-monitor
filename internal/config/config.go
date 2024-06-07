@@ -39,8 +39,10 @@ func validateConfig() error {
 	}
 
 	for _, rawBaseUrl := range strings.Split(viper.GetString("SPRINGBOOT_APPLICATION_BASE_URLS"), ",") {
-		if _, err := url.Parse(rawBaseUrl); err != nil {
-			return errors.New("invalid springboot application base URL: " + err.Error())
+		if u, err := url.Parse(rawBaseUrl); err != nil {
+			return errors.New("failed to parse springboot application base URL: " + err.Error())
+		} else if u.Scheme == "" && u.Host == "" {
+			return errors.New("invalid springboot application base URL: " + rawBaseUrl)
 		}
 	}
 
