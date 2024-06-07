@@ -56,7 +56,7 @@ func validateConfig() error {
 		viper.Set("MONITOR_INTERVAL_MINUTES", defaultMonitorIntervalMins)
 	}
 
-	if !viper.GetBool("ENABLE_OS_ALERTS") && !viper.GetBool("ENABLE_EMAIL_ALERTS") {
+	if !viper.GetBool("ENABLE_DESKTOP_ALERTS") && !viper.GetBool("ENABLE_EMAIL_ALERTS") {
 		return errors.New("atleast one type of alerts should be enabled")
 	}
 
@@ -89,7 +89,7 @@ func parseConfig() {
 }
 
 func isValidSmtpConfig() bool {
-	return viper.GetString("SMTP_HOST") != "" && viper.GetInt("SMTP_PORT") != 0 &&
+	return viper.GetString("SMTP_HDESKTOPT") != "" && viper.GetInt("SMTP_PORT") != 0 &&
 		viper.GetString("SMTP_USER") != "" && viper.GetString("SMTP_PASSWORD") != ""
 }
 
