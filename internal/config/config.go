@@ -3,14 +3,17 @@ package config
 import (
 	"errors"
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
 
 const (
 	defaultMonitorIntervalMins = 5
+	requestTimeoutSeconds      = 25
 	LogoPath                   = "assets/logo.png"
 )
 
@@ -29,6 +32,7 @@ func Load() error {
 	}
 
 	parseConfig()
+	http.DefaultClient.Timeout = time.Second * requestTimeoutSeconds
 
 	return nil
 }
