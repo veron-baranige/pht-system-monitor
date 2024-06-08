@@ -4,28 +4,28 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/martinlindhe/notify"
-	"github.com/veron-baranige/springboot-app-monitor/internal/config"
 	"github.com/veron-baranige/springboot-app-monitor/internal/monitor"
-	"github.com/veron-baranige/springboot-app-monitor/pkg/utils"
 )
 
 type MonitorConfig struct {
-    UrlsToMonitor 	 []string
-	MonitorInterval  time.Duration
-    AppLogoPath   	 string
+	TestConnectivityUrl string
+	UrlsToMonitor       []string
+	MonitorInterval     time.Duration
+	AppLogoPath         string
 }
 
 type MonitorService struct {
-    config *MonitorConfig
+	config *MonitorConfig
 }
 
 func NewMonitorService(config MonitorConfig) *MonitorService {
-    return &MonitorService{
-        config: &config,
-    }
+	return &MonitorService{
+		config: &config,
+	}
 }
 
 func (ms *MonitorService) Start() {
@@ -42,7 +42,7 @@ func (ms *MonitorService) Start() {
 }
 
 func (ms *MonitorService) monitorHealthAndMetrics() {
-	if !utils.IsConnectedToInternet(config.ConnectivityTestUrl) {
+	if !ms.hasInternetConnection() {
 		msg := fmt.Sprintf("[%s] NO INTERNET CONNECTIVITY", time.Now().Format("15:04"))
 		notify.Notify("PHT System Monitor", "PHT System Monitor", msg, ms.config.AppLogoPath)
 		return
@@ -78,4 +78,9 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 			time.Sleep(8 * time.Second)
 		}
 	}
+}
+
+func (ms *MonitorService) hasInternetConnection() bool {
+	_, err := http.Get(ms.config.TestConnectivityUrl)
+	return err == nil
 }
