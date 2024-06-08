@@ -12,6 +12,7 @@ import (
 
 type (
 	Metrics struct {
+		CpuCount    float64
 		CpuUsage    float64
 		DiskTotal   float64
 		DiskUsed    float64
@@ -21,15 +22,21 @@ type (
 )
 
 const (
-	cpuUsageEndpoint      = "/actuator/metrics/system.cpu.usage"
-	jvmMaxMemoryEndpoint  = "/actuator/metrics/jvm.memory.max"
-	jvmUsedMemoryEndpoint = "/actuator/metrics/jvm.memory.used"
-	diskTotalEndpoint     = "/actuator/metrics/disk.total"
-	diskFreeEndpoint      = "/actuator/metrics/disk.free"
+	systemCpuCountEndpoint  = "/actuator/metrics/system.cpu.count"
+	processcpuUsageEndpoint = "/actuator/metrics/process.cpu.usage"
+	jvmMaxMemoryEndpoint    = "/actuator/metrics/jvm.memory.max"
+	jvmUsedMemoryEndpoint   = "/actuator/metrics/jvm.memory.used"
+	diskTotalEndpoint       = "/actuator/metrics/disk.total"
+	diskFreeEndpoint        = "/actuator/metrics/disk.free"
 )
 
 func GetMetrics(ctx context.Context, appBaseUrl string) (Metrics, error) {
-	cpuUsage, err := getCpuUsage(ctx, appBaseUrl)
+	cpuCount, err := getMeasurementValue(ctx, appBaseUrl+systemCpuCountEndpoint)
+	if err != nil {
+		return Metrics{}, err
+	}
+
+	cpuUsage, err := getProcessCpuUsage(ctx, appBaseUrl)
 	if err != nil {
 		return Metrics{}, err
 	}
@@ -55,6 +62,7 @@ func GetMetrics(ctx context.Context, appBaseUrl string) (Metrics, error) {
 	}
 
 	return Metrics{
+		CpuCount:    cpuCount,
 		CpuUsage:    cpuUsage,
 		MemoryTotal: jvmMaxMemory,
 		MemoryUsed:  jvmUsedMemory,
@@ -63,8 +71,8 @@ func GetMetrics(ctx context.Context, appBaseUrl string) (Metrics, error) {
 	}, nil
 }
 
-func getCpuUsage(ctx context.Context, appBaseUrl string) (float64, error) {
-	value, err := getMeasurementValue(ctx, appBaseUrl+cpuUsageEndpoint)
+func getProcessCpuUsage(ctx context.Context, appBaseUrl string) (float64, error) {
+	value, err := getMeasurementValue(ctx, appBaseUrl+processcpuUsageEndpoint)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get cpu usage: %v", err)
 	}
