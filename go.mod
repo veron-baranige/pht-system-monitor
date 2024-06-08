@@ -1,4 +1,4 @@
-module github.com/veron-baranige/pht-system-monitor
+module github.com/veron-baranige/springboot-app-monitor
 
 go 1.22.0
 

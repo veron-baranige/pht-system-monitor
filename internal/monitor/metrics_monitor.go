@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/veron-baranige/pht-system-monitor/pkg/utils"
+	"github.com/veron-baranige/springboot-app-monitor/pkg/utils"
 )
 
 type (
