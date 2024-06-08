@@ -3,17 +3,17 @@ package utils
 import "fmt"
 
 type (
-	StorageUnit string
+	MemoryUnit string
 )
 
 const (
-	Bytes     StorageUnit = "b"
-	Kilobytes StorageUnit = "kb"
-	Megabytes StorageUnit = "mb"
-	Gigabytes StorageUnit = "gb"
+	Bytes     MemoryUnit = "b"
+	Kilobytes MemoryUnit = "kb"
+	Megabytes MemoryUnit = "mb"
+	Gigabytes MemoryUnit = "gb"
 )
 
-func ConvertBytes(bytes float64, unit StorageUnit) (float64, error) {
+func ConvertBytes(bytes float64, unit MemoryUnit) (float64, error) {
 	const (
 		kilobytesInBytes = 1024
 		megabytesInBytes = 1024 * kilobytesInBytes
