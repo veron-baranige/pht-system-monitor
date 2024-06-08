@@ -14,9 +14,10 @@ import (
 
 const (
 	defaultMonitorIntervalMins = 5
+	defaultWarnThreshold       = 80
 	requestTimeoutSeconds      = 25
 	LogoPath                   = "assets/logo.png"
-	ConnectivityTestUrl 	   = "https://google.com"
+	ConnectivityTestUrl        = "https://google.com"
 )
 
 func Load() error {
@@ -55,6 +56,18 @@ func validateConfig() error {
 		log.Printf("Invalid or missing monitor interval configuration. "+
 			"Setting interval to default value: %v mins", defaultMonitorIntervalMins) // warn
 		viper.Set("MONITOR_INTERVAL_MINUTES", defaultMonitorIntervalMins)
+	}
+
+	if viper.GetInt("CPU_USAGE_WARN_THRESHOLD") <= 0 {
+		log.Printf("invalid or missing cpu warn threshold configuration. "+
+			"setting threshold to default value: %v%%", defaultWarnThreshold) // warn
+		viper.Set("CPU_USAGE_WARN_THRESHOLD", defaultWarnThreshold)
+	}
+
+	if viper.GetInt("JVM_MEMORY_USAGE_WARN_THRESHOLD") <= 0 {
+		log.Printf("invalid or missing jvm memory usage warn threshold configuration. "+
+			"setting threshold to default value: %v%%", defaultWarnThreshold) // warn
+		viper.Set("JVM_MEMORY_USAGE_WARN_THRESHOLD", defaultWarnThreshold)
 	}
 
 	if !viper.GetBool("ENABLE_DESKTOP_ALERTS") && !viper.GetBool("ENABLE_EMAIL_ALERTS") {
