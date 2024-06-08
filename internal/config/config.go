@@ -14,7 +14,7 @@ import (
 
 const (
 	defaultMonitorIntervalMins = 5
-	defaultWarnThreshold       = 80
+	defaultWarnThreshold       = 85
 	requestTimeoutSeconds      = 25
 	LogoPath                   = "assets/logo.png"
 	ConnectivityTestUrl        = "https://google.com"
