@@ -25,9 +25,10 @@ func main() {
 	}
 
 	monitorConf := &service.MonitorConfig{
-		UrlsToMonitor:   viper.GetStringSlice("SPRINGBOOT_APPLICATION_BASE_URLS"),
-		MonitorInterval: time.Minute * viper.GetDuration("MONITOR_INTERVAL_MINUTES"),
-		AppLogoPath:     appLogoPath,
+		UrlsToMonitor:       viper.GetStringSlice("SPRINGBOOT_APPLICATION_BASE_URLS"),
+		MonitorInterval:     time.Minute * viper.GetDuration("MONITOR_INTERVAL_MINUTES"),
+		AppLogoPath:         appLogoPath,
+		TestConnectivityUrl: config.ConnectivityTestUrl,
 	}
 
 	monitorService := service.NewMonitorService(*monitorConf)

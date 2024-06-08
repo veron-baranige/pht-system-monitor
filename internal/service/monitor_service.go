@@ -42,7 +42,7 @@ func (ms *MonitorService) Start() {
 }
 
 func (ms *MonitorService) monitorHealthAndMetrics() {
-	if !ms.hasInternetConnection() {
+	if !hasInternetConnection(ms.config.TestConnectivityUrl) {
 		msg := fmt.Sprintf("[%s] NO INTERNET CONNECTIVITY", time.Now().Format("15:04"))
 		notify.Notify("PHT System Monitor", "PHT System Monitor", msg, ms.config.AppLogoPath)
 		return
@@ -80,7 +80,7 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 	}
 }
 
-func (ms *MonitorService) hasInternetConnection() bool {
-	_, err := http.Get(ms.config.TestConnectivityUrl)
+func hasInternetConnection(testConnUrl string) bool {
+	_, err := http.Get(testConnUrl)
 	return err == nil
 }
