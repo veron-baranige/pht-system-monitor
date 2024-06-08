@@ -16,6 +16,7 @@ const (
 	defaultMonitorIntervalMins = 5
 	requestTimeoutSeconds      = 25
 	LogoPath                   = "assets/logo.png"
+	ConnectivityTestUrl 	   = "https://google.com"
 )
 
 func Load() error {
