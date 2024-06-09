@@ -125,7 +125,7 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 				baseUrl, metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
 			msg := fmt.Sprintf("[%v] CPU: %.2f%%, JVM: %.1f/%.1f GB",
 				time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
-			ms.handleAlert(baseUrl, msg, true, false)
+			ms.handleAlert(baseUrl, msg, false, false)
 		}(baseUrl)
 
 		// wait before monitoring next app to provide notification read time
