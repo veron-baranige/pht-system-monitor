@@ -20,7 +20,7 @@ There are 2 types of supported monitoring alerts.
 - Add the desired configurations in the **.env** file inside **config** directory
 
 ### Install Monitoring Service
-`sudo make install` 
+`make install` 
 
 ### Check Service Status
 `systemctl --user status springboot-app-monitor`
@@ -30,4 +30,4 @@ There are 2 types of supported monitoring alerts.
 - Reload the daemon: `systemctl --user daemon-reload`
 
 ### Uninstalling Monitoring Service
-`sudo make uninstall`
+`make uninstall`
