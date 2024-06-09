@@ -69,13 +69,15 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 			status, err := monitor.GetHealthStatus(ctx, baseUrl)
 			if err != nil {
 				if errors.Is(err, monitor.ErrNoActuatorSupport) {
-					msg := fmt.Sprintf("[%s] No actuator support for: %s", time.Now().Format("15:04"), baseUrl+"/actuator")
+					msg := fmt.Sprintf("[%s] No actuator support for: %s", 
+						time.Now().Format("15:04"), baseUrl+"/actuator")
 					ms.handleAlert(baseUrl, msg, true, true)
 					return
 				}
 
 				if errors.Is(err, monitor.ErrNotResponding) {
-					msg := fmt.Sprintf("[%s] %s", time.Now().Format("15:04"), "No response from app. Attention required!")
+					msg := fmt.Sprintf("[%s] %s", 
+						time.Now().Format("15:04"), "No response from app. Attention required!")
 					ms.handleAlert(baseUrl, msg, true, true)
 					return
 				}
@@ -86,21 +88,33 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 			}
 
 			if status != monitor.Up {
-				msg := fmt.Sprintf("[%s] Health Status: %s. Attention required!", time.Now().Format("15:04"), string(status))
+				msg := fmt.Sprintf("[%s] Health Status: %s. Attention required!", 
+					time.Now().Format("15:04"), string(status))
 				ms.handleAlert(baseUrl, msg, true, true)
 				return
 			}
 
 			metrics, err := monitor.GetMetrics(ctx, baseUrl)
 			if err != nil {
-				msg := fmt.Sprintf("[%s] Health status: %s. Failed to get metrics: %s", time.Now().Format("15:04"), string(status), err)
+				msg := fmt.Sprintf("[%s] Health status: %s. Failed to get metrics: %s", 
+					time.Now().Format("15:04"), string(status), err)
 				ms.handleAlert(baseUrl, msg, false, false)
 				return
 			}
 
-			msg := fmt.Sprintf("[%v] CPU: %.2f%%, JVM: %.1f/%.1f GB, DISK: %.1f/%.1f GB",
-				time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuUsage, metrics.MemoryUsed, metrics.MemoryTotal,
-				metrics.DiskUsed, metrics.DiskTotal)
+			exceededCpuUsageThreshold := metrics.CpuUsage * metrics.CpuCount > float64(ms.config.CpuUsageWarnThreshold)
+			exceededJvmUsageThreshold := metrics.MemoryTotal > 0.0 && 
+				(metrics.MemoryUsed / metrics.MemoryTotal)*100 > float64(ms.config.JvmUsageWarnThreshold)
+
+			if exceededCpuUsageThreshold || exceededJvmUsageThreshold {
+                msg := fmt.Sprintf("[%s] Attention required! CPU: %.2f%%, JVM: %.1f/%.1f GB", 
+					time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
+                ms.handleAlert(baseUrl, msg, true, true)
+                return
+            }
+			    
+			msg := fmt.Sprintf("[%v] CPU: %.2f%%, JVM: %.1f/%.1f GB",
+				time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuUsage, metrics.MemoryUsed, metrics.MemoryTotal)
 			ms.handleAlert(baseUrl, msg, false, false)
 		}(baseUrl)
 
