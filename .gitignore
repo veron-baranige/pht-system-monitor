@@ -1,2 +1,5 @@
 bin/
-dist/
+
+dist/springboot-app-monitor
+dist/assets
+dist/config
