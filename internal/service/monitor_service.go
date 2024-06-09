@@ -114,7 +114,7 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
             }
 			    
 			msg := fmt.Sprintf("[%v] CPU: %.2f%%, JVM: %.1f/%.1f GB",
-				time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuUsage, metrics.MemoryUsed, metrics.MemoryTotal)
+				time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
 			ms.handleAlert(baseUrl, msg, false, false)
 		}(baseUrl)
 
