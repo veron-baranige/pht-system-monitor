@@ -16,10 +16,12 @@ import (
 )
 
 type MonitorConfig struct {
+	AppLogoPath           string
 	TestConnectivityUrl   string
+	AlertSoundPath        string
+
 	UrlsToMonitor         []string
 	MonitorInterval       time.Duration
-	AppLogoPath           string
 	CpuUsageWarnThreshold uint32
 	JvmUsageWarnThreshold uint32
 
@@ -123,7 +125,7 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 				baseUrl, metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
 			msg := fmt.Sprintf("[%v] CPU: %.2f%%, JVM: %.1f/%.1f GB",
 				time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
-			ms.handleAlert(baseUrl, msg, false, false)
+			ms.handleAlert(baseUrl, msg, true, false)
 		}(baseUrl)
 
 		// wait before monitoring next app to provide notification read time
@@ -136,18 +138,18 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 func (ms *MonitorService) handleAlert(appBaseUrl string, msgContent string, isAlert bool, sendMail bool) {
 	if ms.config.IsDesktopAlertsEnabled {
 		if !isAlert {
-			if err := exec.Command("notify-send", "-u", "normal", "-i", ms.config.AppLogoPath, appBaseUrl, msgContent).Run(); err != nil {
-				log.Printf("failed to send desktop notification: %v", err)
+			if output, err := exec.Command("notify-send", "-u", "normal", "-i", ms.config.AppLogoPath, appBaseUrl, msgContent).CombinedOutput(); err != nil {
+				log.Printf("failed to send desktop notification: err: %v, output: %v", err, string(output))
 			}
 		} else {
-			if err := exec.Command("notify-send", "-u", "critical", "-i", ms.config.AppLogoPath, appBaseUrl, msgContent).Run(); err != nil {
-				log.Printf("failed to send desktop alert: %v", err)
-			} else if err := exec.Command("paplay", "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga").Run(); err != nil {
-				log.Println("error playing alert sound:", err)
+			if output, err := exec.Command("notify-send", "-u", "critical", "-i", ms.config.AppLogoPath, appBaseUrl, msgContent).CombinedOutput(); err != nil {
+				log.Printf("failed to send desktop alert: err: %v, output: %v", err, string(output))
+			} else if output, err := exec.Command("gst-play-1.0", ms.config.AlertSoundPath).CombinedOutput(); err != nil {
+				log.Printf("error playing alert sound: %s %s", err, string(output))
 			}
 		}
 	}
-	
+
 	if ms.config.IsEmailAlertsEnabled && sendMail {
 		mailErr := sendEmail(ms.config.MailDialer, ms.config.EmailReceipients, "Spring Boot App Monitor - " + appBaseUrl, msgContent)
 		if mailErr != nil {
