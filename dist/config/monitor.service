@@ -1,0 +1,15 @@
+[Unit]
+Description=Spring Boot application health and metrics monitoring service
+After=network.target systemd-user-sessions.service systemd-journald.service
+
+[Service]
+WorkingDirectory=/usr/local/bin/springboot-app-monitor
+ExecStart=/usr/local/bin/springboot-app-monitor/start.sh
+IgnoreSIGPIPE=no
+KillMode=process
+Restart=always
+RestartSec=10
+StartLimitBurst=5
+
+[Install]
+WantedBy=default.target
