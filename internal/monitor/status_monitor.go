@@ -31,7 +31,7 @@ func GetHealthStatus(ctx context.Context, appBaseUrl string) (HealthStatus, erro
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-			return "", ErrNotResponding
+			return Unknown, ErrNotResponding
 		}
 		return Unknown, fmt.Errorf("http client error making request: %v", err)
 	}
