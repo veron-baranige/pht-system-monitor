@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os/exec"
 	"time"
 
-	"github.com/martinlindhe/notify"
 	"github.com/spf13/viper"
 	"github.com/veron-baranige/springboot-app-monitor/internal/monitor"
 	"gopkg.in/gomail.v2"
@@ -135,12 +135,19 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 
 func (ms *MonitorService) handleAlert(appBaseUrl string, msgContent string, isAlert bool, sendMail bool) {
 	if ms.config.IsDesktopAlertsEnabled {
-		if isAlert {
-			notify.Alert(appBaseUrl, appBaseUrl, msgContent, ms.config.AppLogoPath)
+		if !isAlert {
+			if err := exec.Command("notify-send", "-u", "normal", "-i", ms.config.AppLogoPath, appBaseUrl, msgContent).Run(); err != nil {
+				log.Printf("failed to send desktop notification: %v", err)
+			}
 		} else {
-			notify.Notify(appBaseUrl, appBaseUrl, msgContent, ms.config.AppLogoPath)
+			if err := exec.Command("notify-send", "-u", "critical", "-i", ms.config.AppLogoPath, appBaseUrl, msgContent).Run(); err != nil {
+				log.Printf("failed to send desktop alert: %v", err)
+			} else if err := exec.Command("paplay", "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga").Run(); err != nil {
+				log.Println("error playing alert sound:", err)
+			}
 		}
 	}
+	
 	if ms.config.IsEmailAlertsEnabled && sendMail {
 		mailErr := sendEmail(ms.config.MailDialer, ms.config.EmailReceipients, "Spring Boot App Monitor - " + appBaseUrl, msgContent)
 		if mailErr != nil {
