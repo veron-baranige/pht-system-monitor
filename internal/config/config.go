@@ -103,7 +103,7 @@ func parseConfig() {
 }
 
 func isValidSmtpConfig() bool {
-	return viper.GetString("SMTP_HDESKTOPT") != "" && viper.GetInt("SMTP_PORT") != 0 &&
+	return viper.GetString("SMTP_HOST") != "" && viper.GetInt("SMTP_PORT") != 0 &&
 		viper.GetString("SMTP_USER") != "" && viper.GetString("SMTP_PASSWORD") != ""
 }
 
