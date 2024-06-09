@@ -14,8 +14,8 @@ type (
 	Metrics struct {
 		CpuCount    float64
 		CpuUsage    float64
-		DiskTotal   float64
-		DiskUsed    float64
+		// DiskTotal   float64
+		// DiskUsed    float64
 		MemoryUsed  float64
 		MemoryTotal float64
 	}
@@ -51,23 +51,23 @@ func GetMetrics(ctx context.Context, appBaseUrl string) (Metrics, error) {
 		return Metrics{}, err
 	}
 
-	diskTotalSpace, err := getDiskTotalSpace(ctx, appBaseUrl)
-	if err != nil {
-		return Metrics{}, err
-	}
+	// diskTotalSpace, err := getDiskTotalSpace(ctx, appBaseUrl)
+	// if err != nil {
+	// 	return Metrics{}, err
+	// }
 
-	diskFreeSpace, err := getDiskFreeSpace(ctx, appBaseUrl)
-	if err != nil {
-		return Metrics{}, err
-	}
+	// diskFreeSpace, err := getDiskFreeSpace(ctx, appBaseUrl)
+	// if err != nil {
+	// 	return Metrics{}, err
+	// }
 
 	return Metrics{
 		CpuCount:    cpuCount,
 		CpuUsage:    cpuUsage,
 		MemoryTotal: jvmMaxMemory,
 		MemoryUsed:  jvmUsedMemory,
-		DiskTotal:   diskTotalSpace,
-		DiskUsed:    diskFreeSpace,
+		// DiskTotal:   diskTotalSpace,
+		// DiskUsed:    diskFreeSpace,
 	}, nil
 }
 
@@ -109,33 +109,33 @@ func getJvmUsedMemory(ctx context.Context, appBaseUrl string) (float64, error) {
 	return usedMemoryGb, nil
 }
 
-func getDiskTotalSpace(ctx context.Context, appBaseUrl string) (float64, error) {
-	value, err := getMeasurementValue(ctx, appBaseUrl+diskTotalEndpoint)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get disk total space: %v", err)
-	}
+// func getDiskTotalSpace(ctx context.Context, appBaseUrl string) (float64, error) {
+// 	value, err := getMeasurementValue(ctx, appBaseUrl+diskTotalEndpoint)
+// 	if err != nil {
+// 		return 0, fmt.Errorf("failed to get disk total space: %v", err)
+// 	}
 
-	totalDiskSpaceGb, err := utils.ConvertBytes(value, utils.Gigabytes)
-	if err != nil {
-		return 0, fmt.Errorf("failed to convert disk total space to gigabytes: %v", err)
-	}
+// 	totalDiskSpaceGb, err := utils.ConvertBytes(value, utils.Gigabytes)
+// 	if err != nil {
+// 		return 0, fmt.Errorf("failed to convert disk total space to gigabytes: %v", err)
+// 	}
 
-	return totalDiskSpaceGb, nil
-}
+// 	return totalDiskSpaceGb, nil
+// }
 
-func getDiskFreeSpace(ctx context.Context, appBaseUrl string) (float64, error) {
-	value, err := getMeasurementValue(ctx, appBaseUrl+diskFreeEndpoint)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get disk free space: %v", err)
-	}
+// func getDiskFreeSpace(ctx context.Context, appBaseUrl string) (float64, error) {
+// 	value, err := getMeasurementValue(ctx, appBaseUrl+diskFreeEndpoint)
+// 	if err != nil {
+// 		return 0, fmt.Errorf("failed to get disk free space: %v", err)
+// 	}
 
-	freeDiskSpaceGb, err := utils.ConvertBytes(value, utils.Gigabytes)
-	if err != nil {
-		return 0, fmt.Errorf("failed to convert disk free space to gigabytes: %v", err)
-	}
+// 	freeDiskSpaceGb, err := utils.ConvertBytes(value, utils.Gigabytes)
+// 	if err != nil {
+// 		return 0, fmt.Errorf("failed to convert disk free space to gigabytes: %v", err)
+// 	}
 
-	return freeDiskSpaceGb, nil
-}
+// 	return freeDiskSpaceGb, nil
+// }
 
 func getMeasurementValue(ctx context.Context, metricUrl string) (float64, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, metricUrl, nil)
