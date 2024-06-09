@@ -1,5 +1,2 @@
-bin/
-
-dist/springboot-app-monitor
-dist/assets
-dist/config
+dist/bin
+dist/assets/
