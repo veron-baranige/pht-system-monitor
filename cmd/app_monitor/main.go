@@ -20,6 +20,7 @@ func main() {
 	log.Println("setting up application")
 	config.SetHttpClientConfig()
 
+	alertSoundPath, _ := filepath.Abs(config.AlertSoundPath)
 	appLogoPath, err := filepath.Abs(config.LogoPath)
 	if err != nil {
 		log.Fatal(err)
@@ -43,6 +44,7 @@ func main() {
 		IsEmailAlertsEnabled:   viper.GetBool("ENABLE_EMAIL_ALERTS"),
 		MailDialer:             mailDialer,
 		EmailReceipients:       viper.GetStringSlice("EMAIL_ALERT_RECIPIENTS"),
+		AlertSoundPath:         alertSoundPath,
 	}
 
 	monitorService := service.NewMonitorService(*monitorConf)
