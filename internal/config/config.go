@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -17,6 +18,7 @@ const (
 	defaultWarnThreshold       = 85
 	requestTimeoutSeconds      = 25
 	LogoPath                   = "assets/logo.png"
+	AlertSoundPath 			   = "assets/echo-alert.mp3"
 	ConnectivityTestUrl        = "https://google.com"
 )
 
@@ -35,6 +37,7 @@ func Load() error {
 	}
 
 	parseConfig()
+	enableDesktopNotificationConfig()
 
 	return nil
 }
@@ -114,4 +117,14 @@ func SetHttpClientConfig() {
 			InsecureSkipVerify: true,
 		},
 	}
+}
+
+func enableDesktopNotificationConfig() {
+    uid := viper.GetString("UID")
+    dbusSessionBusAddr := "unix:path=/run/user/" + uid + "/bus"
+	os.Setenv("DBUS_SESSION_BUS_ADDRESS", dbusSessionBusAddr)
+    
+	pulseServerAddr := "unix:/run/user/" + uid + "/pulse/native"
+    os.Setenv("PULSE_SERVER", pulseServerAddr)
+	os.Setenv("GST_DEBUG", "3")
 }
