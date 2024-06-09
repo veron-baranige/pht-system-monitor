@@ -69,6 +69,7 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 			status, err := monitor.GetHealthStatus(ctx, baseUrl)
 			if err != nil {
 				if errors.Is(err, monitor.ErrNoActuatorSupport) {
+					log.Printf("No actuator support for: %s", baseUrl)
 					msg := fmt.Sprintf("[%s] No actuator support for: %s", 
 						time.Now().Format("15:04"), baseUrl+"/actuator")
 					ms.handleAlert(baseUrl, msg, true, true)
@@ -76,18 +77,21 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 				}
 
 				if errors.Is(err, monitor.ErrNotResponding) {
+					log.Printf("Timeout exceeded. No response from: %s", baseUrl)
 					msg := fmt.Sprintf("[%s] %s", 
 						time.Now().Format("15:04"), "No response from app. Attention required!")
 					ms.handleAlert(baseUrl, msg, true, true)
 					return
 				}
 
+				log.Printf("Failed to get health status. Err: %s", err)
 				msg := fmt.Sprintf("[%s] Failed to get health status: %s", time.Now().Format("15:04"), err)
 				ms.handleAlert(baseUrl, msg, true, true)
 				return
 			}
 
 			if status != monitor.Up {
+				log.Printf("Health status: %s for: %s", status, baseUrl)
 				msg := fmt.Sprintf("[%s] Health Status: %s. Attention required!", 
 					time.Now().Format("15:04"), string(status))
 				ms.handleAlert(baseUrl, msg, true, true)
@@ -96,6 +100,7 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 
 			metrics, err := monitor.GetMetrics(ctx, baseUrl)
 			if err != nil {
+				log.Printf("Failed to get metrics for: %s. Err: %s", baseUrl, err)
 				msg := fmt.Sprintf("[%s] Health status: %s. Failed to get metrics: %s", 
 					time.Now().Format("15:04"), string(status), err)
 				ms.handleAlert(baseUrl, msg, false, false)
@@ -107,12 +112,15 @@ func (ms *MonitorService) monitorHealthAndMetrics() {
 				(metrics.MemoryUsed / metrics.MemoryTotal)*100 > float64(ms.config.JvmUsageWarnThreshold)
 
 			if exceededCpuUsageThreshold || exceededJvmUsageThreshold {
+				log.Printf("Exceeded CPU/JVM threshold: %s", baseUrl)
                 msg := fmt.Sprintf("[%s] Attention required! CPU: %.2f%%, JVM: %.1f/%.1f GB", 
 					time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
                 ms.handleAlert(baseUrl, msg, true, true)
                 return
             }
 			    
+			log.Printf("[%v] CPU: %.2f%%, JVM: %.1f/%.1f GB", 
+				baseUrl, metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
 			msg := fmt.Sprintf("[%v] CPU: %.2f%%, JVM: %.1f/%.1f GB",
 				time.Now().Format("15:04"), metrics.CpuUsage*metrics.CpuCount, metrics.MemoryUsed, metrics.MemoryTotal)
 			ms.handleAlert(baseUrl, msg, false, false)
